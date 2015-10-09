@@ -2,34 +2,41 @@
 path = github.com/gogits/gogs
 
 [deps]
-github.com/beego/memcache = commit:2aea774416
+github.com/bradfitz/gomemcache = commit:72a68649ba
 github.com/Unknwon/cae = commit:2e70a1351b
-github.com/Unknwon/com = commit:d9bcf409c8
-github.com/Unknwon/i18n = commit:1e88666229
-github.com/Unknwon/macaron = 
-github.com/codegangsta/cli = commit:a14c5b47c7
-github.com/go-sql-driver/mysql = commit:04cf947760
-github.com/go-xorm/core = commit:e7882d8b00
-github.com/go-xorm/xorm = commit:dcc529b68a
+github.com/Unknwon/com = commit:47d7d2b81a
+github.com/Unknwon/i18n = commit:7457d88830
+github.com/Unknwon/macaron = commit:05317cffe5
+github.com/Unknwon/paginater = commit:cab2d086fa
+github.com/codegangsta/cli = commit:142e6cd241
+github.com/go-sql-driver/mysql = commit:527bcd55aa
+github.com/go-xorm/core = commit:3e10003353
+github.com/go-xorm/xorm = commit:803f6db50c
 github.com/gogits/chardet = commit:2404f77725
-github.com/gogits/go-gogs-client = commit:92e76d616a
-github.com/lib/pq = commit:3e3efe51a0
-github.com/macaron-contrib/binding = commit:0fbe4b9707
-github.com/macaron-contrib/cache = 
-github.com/macaron-contrib/captcha = commit:3567dc48b8
-github.com/macaron-contrib/csrf = commit:3ea14e7ee7
-github.com/macaron-contrib/i18n = commit:0ee0539c84
-github.com/macaron-contrib/oauth2 = commit:8f394c3629
-github.com/macaron-contrib/session = 
-github.com/macaron-contrib/toolbox = commit:57127bcc89
-github.com/mattn/go-sqlite3 = commit:a80c27ba33
-github.com/microcosm-cc/bluemonday = 
-github.com/nfnt/resize = commit:8f44931448
-github.com/russross/blackfriday = commit:05b8cefd6a
-github.com/shurcooL/go = commit:48293cbc7a
-gopkg.in/ini.v1 = commit:28ad8c408b
+github.com/gogits/go-gogs-client = commit:519eee0af0
+github.com/issue9/identicon = 
+github.com/lib/pq = commit:b269bd035a
+github.com/macaron-contrib/binding = commit:1935a991f2
+github.com/macaron-contrib/cache = commit:a139ea1eee
+github.com/macaron-contrib/captcha = commit:9a0a0b1468
+github.com/macaron-contrib/csrf = commit:98ddf5a710
+github.com/macaron-contrib/i18n = commit:da2b19e90b
+github.com/macaron-contrib/session = commit:e48134e803
+github.com/macaron-contrib/toolbox = commit:acbfe36e16
+github.com/mattn/go-sqlite3 = commit:b808f01f66
+github.com/mcuadros/go-version = commit:d52711f8d6
+github.com/microcosm-cc/bluemonday = commit:85ba47ef2c
+github.com/mssola/user_agent = commit:a163d6a569
+github.com/msteinert/pam = commit:6534f23b39
+github.com/nfnt/resize = commit:dc93e1b98c
+github.com/russross/blackfriday = commit:8cec3a854e
+github.com/shurcooL/sanitized_anchor_name = commit:244f5ac324
+golang.org/x/net = 
+golang.org/x/text = 
+gopkg.in/gomail.v2 = commit:b1e55520bf
+gopkg.in/ini.v1 = commit:e8c222fea7
 gopkg.in/redis.v2 = commit:e617904962
 
 [res]
-include = conf|etc|public|scripts|templates
+include = public|scripts|templates
 

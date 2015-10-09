@@ -14,8 +14,8 @@ import (
 	"github.com/Unknwon/macaron"
 
 	"github.com/gogits/gogs/models"
+	"github.com/gogits/gogs/models/cron"
 	"github.com/gogits/gogs/modules/base"
-	"github.com/gogits/gogs/modules/cron"
 	"github.com/gogits/gogs/modules/middleware"
 	"github.com/gogits/gogs/modules/process"
 	"github.com/gogits/gogs/modules/setting"
@@ -114,8 +114,7 @@ func updateSystemStatus() {
 type AdminOperation int
 
 const (
-	CLEAN_UNBIND_OAUTH AdminOperation = iota + 1
-	CLEAN_INACTIVATE_USER
+	CLEAN_INACTIVATE_USER AdminOperation = iota + 1
 	CLEAN_REPO_ARCHIVES
 	GIT_GC_REPOS
 	SYNC_SSH_AUTHORIZED_KEY
@@ -134,9 +133,6 @@ func Dashboard(ctx *middleware.Context) {
 		var success string
 
 		switch AdminOperation(op) {
-		case CLEAN_UNBIND_OAUTH:
-			success = ctx.Tr("admin.dashboard.clean_unbind_oauth_success")
-			err = models.CleanUnbindOauth()
 		case CLEAN_INACTIVATE_USER:
 			success = ctx.Tr("admin.dashboard.delete_inactivate_accounts_success")
 			err = models.DeleteInactivateUsers()
@@ -171,7 +167,7 @@ func Dashboard(ctx *middleware.Context) {
 }
 
 func Config(ctx *middleware.Context) {
-	ctx.Data["Title"] = ctx.Tr("admin.users")
+	ctx.Data["Title"] = ctx.Tr("admin.config")
 	ctx.Data["PageIsAdmin"] = true
 	ctx.Data["PageIsAdminConfig"] = true
 
@@ -188,22 +184,13 @@ func Config(ctx *middleware.Context) {
 	ctx.Data["ReverseProxyAuthUser"] = setting.ReverseProxyAuthUser
 
 	ctx.Data["Service"] = setting.Service
-
 	ctx.Data["DbCfg"] = models.DbCfg
-
-	ctx.Data["WebhookTaskInterval"] = setting.WebhookTaskInterval
-	ctx.Data["WebhookDeliverTimeout"] = setting.WebhookDeliverTimeout
+	ctx.Data["Webhook"] = setting.Webhook
 
 	ctx.Data["MailerEnabled"] = false
 	if setting.MailService != nil {
 		ctx.Data["MailerEnabled"] = true
 		ctx.Data["Mailer"] = setting.MailService
-	}
-
-	ctx.Data["OauthEnabled"] = false
-	if setting.OauthService != nil {
-		ctx.Data["OauthEnabled"] = true
-		ctx.Data["Oauther"] = setting.OauthService
 	}
 
 	ctx.Data["CacheAdapter"] = setting.CacheAdapter
@@ -232,6 +219,6 @@ func Monitor(ctx *middleware.Context) {
 	ctx.Data["PageIsAdmin"] = true
 	ctx.Data["PageIsAdminMonitor"] = true
 	ctx.Data["Processes"] = process.Processes
-	ctx.Data["Entries"] = cron.ListEntries()
+	ctx.Data["Entries"] = cron.ListTasks()
 	ctx.HTML(200, MONITOR)
 }
