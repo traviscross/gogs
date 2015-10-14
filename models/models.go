@@ -72,7 +72,7 @@ var (
 	HasEngine bool
 
 	DbCfg struct {
-		Type, Host, Name, User, Passwd, Path, SSLMode string
+		Type, URI, Host, Name, User, Passwd, Path, SSLMode string
 	}
 
 	EnableSQLite3 bool
@@ -118,13 +118,16 @@ func LoadConfigs() {
 	}
 	DbCfg.SSLMode = sec.Key("SSL_MODE").String()
 	DbCfg.Path = sec.Key("PATH").MustString("data/gogs.db")
+	DbCfg.URI = sec.Key("URI").String()
 }
 
 func getEngine() (*xorm.Engine, error) {
 	cnnstr := ""
 	switch DbCfg.Type {
 	case "mysql":
-		if DbCfg.Host[0] == '/' { // looks like a unix socket
+		if DbCfg.URI != "" {
+			cnnstr = DbCfg.URI
+		} else if DbCfg.Host[0] == '/' { // looks like a unix socket
 			cnnstr = fmt.Sprintf("%s:%s@unix(%s)/%s?charset=utf8&parseTime=true",
 				DbCfg.User, DbCfg.Passwd, DbCfg.Host, DbCfg.Name)
 		} else {
@@ -132,32 +135,44 @@ func getEngine() (*xorm.Engine, error) {
 				DbCfg.User, DbCfg.Passwd, DbCfg.Host, DbCfg.Name)
 		}
 	case "postgres":
-		var host, port = "127.0.0.1", "5432"
-		fields := strings.Split(DbCfg.Host, ":")
-		if len(fields) > 0 && len(strings.TrimSpace(fields[0])) > 0 {
-			host = fields[0]
+		if DbCfg.URI != "" {
+			cnnstr = DbCfg.URI
+		} else {
+			var host, port = "127.0.0.1", "5432"
+			fields := strings.Split(DbCfg.Host, ":")
+			if len(fields) > 0 && len(strings.TrimSpace(fields[0])) > 0 {
+				host = fields[0]
+			}
+			if len(fields) > 1 && len(strings.TrimSpace(fields[1])) > 0 {
+				port = fields[1]
+			}
+			cnnstr = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+				url.QueryEscape(DbCfg.User), url.QueryEscape(DbCfg.Passwd), host, port, DbCfg.Name, DbCfg.SSLMode)
 		}
-		if len(fields) > 1 && len(strings.TrimSpace(fields[1])) > 0 {
-			port = fields[1]
-		}
-		cnnstr = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-			url.QueryEscape(DbCfg.User), url.QueryEscape(DbCfg.Passwd), host, port, DbCfg.Name, DbCfg.SSLMode)
 	case "sqlite3":
 		if !EnableSQLite3 {
 			return nil, fmt.Errorf("Unknown database type: %s", DbCfg.Type)
 		}
-		if err := os.MkdirAll(path.Dir(DbCfg.Path), os.ModePerm); err != nil {
-			return nil, fmt.Errorf("Fail to create directories: %v", err)
+		if DbCfg.URI != "" {
+			cnnstr = DbCfg.URI
+		} else {
+			if err := os.MkdirAll(path.Dir(DbCfg.Path), os.ModePerm); err != nil {
+				return nil, fmt.Errorf("Fail to create directories: %v", err)
+			}
+			cnnstr = "file:" + DbCfg.Path + "?cache=shared&mode=rwc"
 		}
-		cnnstr = "file:" + DbCfg.Path + "?cache=shared&mode=rwc"
 	case "tidb":
 		if !EnableTidb {
 			return nil, fmt.Errorf("Unknown database type: %s", DbCfg.Type)
 		}
-		if err := os.MkdirAll(path.Dir(DbCfg.Path), os.ModePerm); err != nil {
-			return nil, fmt.Errorf("Fail to create directories: %v", err)
+		if DbCfg.URI != "" {
+			cnnstr = DbCfg.URI
+		} else {
+			if err := os.MkdirAll(path.Dir(DbCfg.Path), os.ModePerm); err != nil {
+				return nil, fmt.Errorf("Fail to create directories: %v", err)
+			}
+			cnnstr = "goleveldb://" + DbCfg.Path
 		}
-		cnnstr = "goleveldb://" + DbCfg.Path
 	default:
 		return nil, fmt.Errorf("Unknown database type: %s", DbCfg.Type)
 	}

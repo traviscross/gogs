@@ -104,6 +104,7 @@ func Install(ctx *middleware.Context) {
 	form.DbUser = models.DbCfg.User
 	form.DbName = models.DbCfg.Name
 	form.DbPath = models.DbCfg.Path
+	form.DbURI = models.DbCfg.URI
 
 	ctx.Data["CurDbOption"] = "MySQL"
 	switch models.DbCfg.Type {
@@ -188,9 +189,11 @@ func InstallPost(ctx *middleware.Context, form auth.InstallForm) {
 	models.DbCfg.Name = form.DbName
 	models.DbCfg.SSLMode = form.SSLMode
 	models.DbCfg.Path = form.DbPath
+	models.DbCfg.URI = form.DbURI
 
 	if (models.DbCfg.Type == "sqlite3" || models.DbCfg.Type == "tidb") &&
-		len(models.DbCfg.Path) == 0 {
+		len(models.DbCfg.Path) == 0 &&
+		len(models.DbCfg.URI) == 0 {
 		ctx.Data["Err_DbPath"] = true
 		ctx.RenderWithErr(ctx.Tr("install.err_empty_db_path"), INSTALL, &form)
 		return
@@ -270,6 +273,7 @@ func InstallPost(ctx *middleware.Context, form auth.InstallForm) {
 	cfg.Section("database").Key("PASSWD").SetValue(models.DbCfg.Passwd)
 	cfg.Section("database").Key("SSL_MODE").SetValue(models.DbCfg.SSLMode)
 	cfg.Section("database").Key("PATH").SetValue(models.DbCfg.Path)
+	cfg.Section("database").Key("URI").SetValue(models.DbCfg.URI)
 
 	cfg.Section("").Key("APP_NAME").SetValue(form.AppName)
 	cfg.Section("repository").Key("ROOT").SetValue(form.RepoRootPath)
